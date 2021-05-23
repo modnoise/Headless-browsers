@@ -12,7 +12,7 @@
 
 [Методичні вказівки](https://jace-dev.herokuapp.com/design/js-talks#/)
 
-[Доповідь](https://github.com/ivanhulak/software_engineering_template/blob/master/Report.md)
+[Доповідь](https://github.com/modnoise/Headless-browsers/blob/main/Report.md)
 
 
 
