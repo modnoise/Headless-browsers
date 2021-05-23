@@ -125,7 +125,94 @@ ___
 У більшості випадків ви можете протестувати веб-сайт, не використовуючи DOM, але є моменти, коли ваші тести повинні взаємодіяти з елементами HTML. Якщо ви надаєте перевагу запускати тести в командному рядку, це означає, що **PhantomJS** - якраз те, що вам потрібно.
 
 Звичайно, **PhantomJS** не є тестовою бібліотекою, але багато інших популярних бібліотек тестування можуть працювати поверх **PhantomJS**. Як показано [на вікі-сторінці PhantomJS](https://phantomjs.org/headless-testing.html), тестові бігуни **PhantomJS** доступні практично для будь-якої бібліотеки тестування, яку ви, можливо, захочете використовувати. Давайте подивимося, як використовувати **PhantomJS** разом з ***Jasmine*** і ***Mocha***.
+![image](https://user-images.githubusercontent.com/54907481/119277127-7a34ec80-bc26-11eb-81dc-4685a9c71fb0.png)
+>Наразі Jasmine немає хорошого бігуна тестів для **PhantomJS**. Якщо ви використовуєте Windows і Visual Studio, варто звернути увагу на [Chutzpah](https://chutzpah.codeplex.com/), а розробникам **Rails** слід спробувати [guard-jasmine](https://github.com/netzpirat/guard-jasmine). В інших же випадках підтримка ***Jasmine*** + ***PhantomJS*** досить хороша.
 
-Наразі Jasmine немає хорошого бігуна тестів для **PhantomJS**. Якщо ви використовуєте Windows і Visual Studio, варто звернути увагу на [Chutzpah](https://chutzpah.codeplex.com/), а розробникам **Rails** слід спробувати [guard-jasmine](https://github.com/netzpirat/guard-jasmine). В інших же випадках підтримка ***Jasmine*** + ***PhantomJS*** досить хороша.
+#### ОДНАК...
+Можливо, у вас вже є проект з використанням **Jasmine** і ви хочете використовувати його разом з **PhantomJS**. Є один проект, [phantom-jasmine](https://github.com/jcarver989/phantom-jasmine), який вимагає трохи роботи для настройки, але в ньому все запуститься.
+
+Почнемо з набору тестів **JasmineJS**. Потрібно завантажити код (посилання вгорі) і перевірити папку `examples`. Ви побачите, що у нас є файл `example.js`, який створює елемент DOM, встановлює кілька властивостей і додає його в тіло. Потім ми запускаємо тест **Jasmine** `example_spec.js`, щоб гарантувати, що процес дійсно працює правильно. Ось вміст цього файлу:
+***example.js***
+```Javascript
+var DOM Tests = {
+  map: function(array, func) {
+    var len = array.length;
+    var results = new Array(len);
+
+    for(var i = 0; i < len; i++) {
+      results[i] = func(array[i]);
+    }
+
+    return results;
+  },
+
+  reduce: function(array, acc, func) {
+    for (var i = 0, len = array.length; i < len; i++) {
+      acc = func(acc, array[i]);
+    }
+
+    return acc;
+  }
+};
+```
+***example_spec.js***
+```Javascript
+describe("DOM_Tests", function() {
+var el = document.createElement("div");
+    el.id = "myDiv";
+    el.innerHTML = "Hi there!";
+    el.style.background = "#ccc";
+    document.body.appendChild(el);
+
+    var myEl = document.getElementById('myDiv');
+    it("is in the DOM", function () {
+        expect(myEl).not.toBeNull();
+    });
+
+    it("is a child of the body", function () {
+        expect(myEl.parentElement).toBe(document.body);
+    });
+
+    it("has the right text", function () {
+        expect(myEl.innerHTML).toEqual("Hi there!");
+    });
+
+    it("has the right background", function () {
+        expect(myEl.style.background).toEqual("rgb(204, 204, 204)");
+    });
+    it ("should map some values", function() {
+    var array = [1,2,3];
+    var results = DOM_Tests.map(array, function(item) {
+      return item * 2;
+    });
+
+    expect(results).toEqual([2,4,6]);
+  });
+
+  it ("should reduce some values", function() {
+    var array = [1,2,3];
+    var result = DOM_Tests.reduce(array, 0, function(acc, item){
+      return acc + item;
+    });
+
+    expect(result).toEqual(6);
+  });
+
+  it ("should fail for the example", function() {
+    expect(false).toBeTruthy();
+  });
+});
+```
+Файл `TestRunner.html` є досить простим; єдина відмінність полягає в тому, що я перемістив теги сценарію в body, щоб гарантувати, що DOM повністю завантажиться до запуску наших тестів. Ми можемо відкрити файл в браузері і побачити, що всі тести проходять просто відмінно.
+![image](https://user-images.githubusercontent.com/54907481/119277484-b36e5c00-bc28-11eb-8e00-9d001be62d24.png)
+___
+Давайте перейдемо до проекту **PhantomJS**. По-перше, потрібно клонувати проект **phantom-jasmine**:
+```
+git clone git: //github.com/jcarver989/phantom-jasmine.git
+```
+Можливо, цей проект не так вже й добре організований, але в ньому є дві важливі частини:
+- бігун PhantomJS (який змушує Jasmine використовувати PhantomJS DOM).
+- репортер консолі Jasmine (який дає консольний висновок).
+Обидва цих файли знаходяться в папці `lib`. Скопіюйте їх в `examples / lib.` Тепер нам потрібно відкрити наш файл TestRunner.html і налаштувати елементи `<script />`. Ось як вони повинні виглядати:
 
 [1]: https://phantomjs.org/download.html "сторінці завантаження PhantomJS"
