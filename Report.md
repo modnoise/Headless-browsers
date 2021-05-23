@@ -242,4 +242,16 @@ phantomjs lib/run_jasmine_test.coffee ./TestRunner.html
 Звичайно, якщо тест не вдався, ви побачите щось типу такого:
 ![image](https://user-images.githubusercontent.com/54907481/119277868-bbc79680-bc2a-11eb-980e-70d481175c40.png)
 
+Якщо ви плануєте часто це запускати, може бути гарною ідеєю перемістити `run_jasmine_test.coffee` в інше місце (наприклад, `~ / bin / run_jasmine_test.coffee`) і створити псевдонім терміналу для всієї команди. Ось як ми зробили б це в оболонці **Bash**:
+```
+alias phantom-jasmine='phantomjs /path/to/run_jasmine_test.coffee'
+```
+Просто додайте це в свій файл `.bashrc` або `.bash_profile`. Тепер ми можемо просто запустити:
+```
+phantom-jasmine TestRunner.html
+```
+Тепер наші тести **Jasmine** відмінно працюють і в терміналі через **PhantomJS**. Ми зможемо побачити остаточний код в папці `jasmine-total`.
+
+### PhantomJS і Mocha
+
 [1]: https://phantomjs.org/download.html "сторінці завантаження PhantomJS"
