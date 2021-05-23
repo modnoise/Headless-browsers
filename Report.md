@@ -253,5 +253,87 @@ phantom-jasmine TestRunner.html
 Тепер наші тести **Jasmine** відмінно працюють і в терміналі через **PhantomJS**. Ми зможемо побачити остаточний код в папці `jasmine-total`.
 
 ### PhantomJS і Mocha
+![image](https://user-images.githubusercontent.com/54907481/119278152-2cbb7e00-bc2c-11eb-879d-472d224f27b2.png)
+На щастя, набагато простіше інтегрувати **Mocha** і **PhantomJS** за допомогою `mocha-phantomjs`. Його дуже просто встановити, якщо у вас встановлений NPM:
+```
+npm install -g mocha-phantomjs
+```
 
+Ця команда встановлює бінарний файл `mocha-phantomjs`, який ми будемо використовувати для запуску наших тестів.
+
+>Як і у випадку з **Jasmine**, ми почнемо з репортера HTML-тесту, який може працювати в браузері. Краса цього полягає в тому, що ми зможемо запустити той же файл на терміналі для результатів консольних тестів за допомогою **PhantomJS** (як ми зробили з **Jasmine**).
+
+Отже, давайте побудуємо простий проект. Створимо каталог проекту і перейдемо в нього. Ми почнемо з файлу `package.json`:
+```json
+{
+    "name": "project",
+    "version": "0.0.1",
+    "devDependencies": {
+        "mocha": "*",
+        "chai" : "*"
+    }
+}
+```
+**Mocha** - це тестове середовище, і ми будемо використовувати **Chai** як бібліотеку тверджень. Ми встановлюємо їх за допомогою NPM.
+
+Ми назвемо наш тестовий файл `test / tests.js`, і ось його тести:
+```Javascript
+describe("DOM Tests", function () {
+    var el = document.createElement("div");
+    el.id = "myDiv";
+    el.innerHTML = "Hi there!";
+    el.style.background = "#ccc";
+    document.body.appendChild(el);
+
+    var myEl = document.getElementById('myDiv');
+    it("is in the DOM", function () {
+        expect(myEl).to.not.equal(null);
+    });
+
+    it("is a child of the body", function () {
+        expect(myEl.parentElement).to.equal(document.body);
+    });
+
+    it("has the right text", function () {
+        expect(myEl.innerHTML).to.equal("Hi there!");
+    });
+
+    it("has the right background", function () {
+        expect(myEl.style.background).to.equal("rgb(204, 204, 204)");
+    });
+});
+```
+>Вони дуже схожі на тести **Jasmine**, але синтаксис затвердження **Chai** трохи відрізняється (так що не можна просто скопіювати тести **Jasmine**).
+
+Останній фрагмент головоломки - файл `TestRunner.html`:
+```html
+<html>
+    <head>
+        <title> Tests </title>
+        <link rel="stylesheet" href="./node_modules/mocha/mocha.css" />
+    </head>
+    <body>
+        <div id="mocha"></div>
+        <script src="./node_modules/mocha/mocha.js"></script>
+        <script src="./node_modules/chai/chai.js"></script>
+        <script>
+            mocha.ui('bdd'); 
+            mocha.reporter('html');
+            var expect = chai.expect;
+        </script>
+        <script src="test/test.js"></script>
+        <script>
+            if (window.mochaPhantomJS) { mochaPhantomJS.run(); }
+            else { mocha.run(); }
+        </script>
+    </body>
+</html>
+```
+Тут є кілька важливих факторів. По-перше, зверніть увагу, що досить працювати в браузері; у нас є CSS і JavaScript з модулів node, які ми встановили. Потім зверніть увагу на тег script. Він визначає, завантажений чи PhantomJS, і якщо це так, запускається функціонал PhantomJS. В іншому випадку, він дотримується простої функціональності Mocha. Ви можете спробувати це в браузері і подивитися, як це працює.
+
+Щоб запустити його в консолі, просто виконайте це:
+
+1
+mocha-phantomjs TestRunner.html
+Вуаля! Тепер ви запускаєте тести з консолі, і все це завдяки PhantomJS.
 [1]: https://phantomjs.org/download.html "сторінці завантаження PhantomJS"
