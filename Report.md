@@ -72,8 +72,10 @@ phantom.exit();
 phantomjs simple.js
 ```
 Отримаємо:
+
 ![image](https://user-images.githubusercontent.com/54907481/119245430-02ad8180-bb82-11eb-9e71-d6347f6b6d0b.png)
-Звичайно, це простий, але це хороший момент: PhantomJS може виконувати JavaScript так само, як браузер. Однак в цьому прикладі немає ніякого коду, специфічного для PhantomJS ... ну, крім останнього рядка. Це важливий рядок для кожного скрипта PhantomJS, тому що він завершує сценарій. Це може не мати сенсу тут, але пам'ятайте, що JavaScript не завжди виконується лінійно. Наприклад, ви можете помістити виклик `exit ()` в функцію зворотного виклику.
+
+Звичайно, це простий, але це хороший момент: **PhantomJS** може виконувати JavaScript так само, як браузер. Однак в цьому прикладі немає ніякого коду, специфічного для **PhantomJS** ... ну, крім останнього рядка. Це важливий рядок для кожного скрипта **PhantomJS**, тому що він завершує сценарій. Це може не мати сенсу тут, але пам'ятайте, що JavaScript не завжди виконується лінійно. Наприклад, ви можете помістити виклик `exit ()` в функцію зворотного виклику.
 
 Давайте розглянемо більш складний приклад.
 ___
@@ -214,5 +216,30 @@ git clone git: //github.com/jcarver989/phantom-jasmine.git
 - бігун PhantomJS (який змушує Jasmine використовувати PhantomJS DOM).
 - репортер консолі Jasmine (який дає консольний висновок).
 Обидва цих файли знаходяться в папці `lib`. Скопіюйте їх в `examples / lib.` Тепер нам потрібно відкрити наш файл TestRunner.html і налаштувати елементи `<script />`. Ось як вони повинні виглядати:
+
+```Javascript
+<script src="lib/jasmine-1.2.0/jasmine.js"></script>
+<script src="lib/jasmine-1.2.0/jasmine-html.js"></script>
+<script src="lib/console-runner.js"></script>
+<script src="tests.js"></script>
+ 
+<script>
+    var console_reporter = new jasmine.ConsoleReporter()
+    jasmine.getEnv().addReporter(new jasmine.HtmlReporter());
+    jasmine.getEnv().addReporter(console_reporter);
+    jasmine.getEnv().execute();
+</script>
+```
+>Зверніть увагу, що у нас є два репортера для наших тестів: репортер HTML і консольний репортер. Це означає, що `TestRunner.html` і його тести можуть виконуватися як в браузері, так і в консолі. Це зручно. На жаль, нам потрібна змінна `console_reporter`, але вона використовується усередині файлу CoffeeScript, який ми збираємося запустити.
+
+Отже, **як** ми можемо почати виконання цих тестів **в консолі**? Припускаючи, що ми перебуваємо в папці `examples`, ось команда для запуску через термінал:
+```
+phantomjs lib/run_jasmine_test.coffee ./TestRunner.html
+```
+Ми запускаємо сценарій `run_jasmine_test.coffee` за допомогою **PhantomJS** і передаємо наш файл TestRunner.html як параметр. Ми повинні побачити щось на зразок цього:
+![image](https://user-images.githubusercontent.com/54907481/119277828-80c56300-bc2a-11eb-8953-a4adf994a4b4.png)
+
+Звичайно, якщо тест не вдався, ви побачите щось типу такого:
+![image](https://user-images.githubusercontent.com/54907481/119277868-bbc79680-bc2a-11eb-980e-70d481175c40.png)
 
 [1]: https://phantomjs.org/download.html "сторінці завантаження PhantomJS"
