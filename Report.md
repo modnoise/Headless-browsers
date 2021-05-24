@@ -237,6 +237,7 @@ git clone git: //github.com/jcarver989/phantom-jasmine.git
 phantomjs lib/run_jasmine_test.coffee ./TestRunner.html
 ```
 Ми запускаємо сценарій `run_jasmine_test.coffee` за допомогою **PhantomJS** і передаємо наш файл TestRunner.html як параметр. Ми повинні побачити щось на зразок цього:
+
 ![image](https://user-images.githubusercontent.com/54907481/119277828-80c56300-bc2a-11eb-8953-a4adf994a4b4.png)
 
 Звичайно, якщо тест не вдався, ви побачите щось типу такого:
